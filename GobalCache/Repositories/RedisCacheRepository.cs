@@ -2,46 +2,64 @@
 {
     using GobalCache.Models;
     using StackExchange.Redis;
-    using System.Text.Json;
 
     public class RedisCacheRepository : ICacheRepository
     {
-        private readonly IConnectionMultiplexer _redis;
+        private readonly IDatabase _db;
 
         public RedisCacheRepository(IConnectionMultiplexer redis)
         {
-            _redis = redis;
+            _db = redis.GetDatabase();
         }
 
-        public void SetValue(int bookingSiteId, string method, string dictionaryName, string key, int lifeTimeMinutes, string value)
+        public bool Set(CacheKey cacheKey, int lifeTimeMinutes, string value)
         {
-            string redisKey = GenerateKey(bookingSiteId, method, dictionaryName, key);
-
-            var db = _redis.GetDatabase();
-
-            db.StringSet(redisKey, value, new TimeSpan(0, lifeTimeMinutes, 0));
-        }
-
-        public string GetValue(int bookingSiteId, string method, string dictionaryName, string key)
-        {
-            var db = _redis.GetDatabase();
-
-            string redisKey = GenerateKey(bookingSiteId, method, dictionaryName, key);
-
-            var value = db.StringGet(redisKey);
-
-            if (!string.IsNullOrEmpty(value))
+            try
             {
+                return _db.StringSet(cacheKey.GetRedisKey(), value, new TimeSpan(0, lifeTimeMinutes, 0));
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public string? Get(CacheKey cacheKey)
+        {
+            try
+            {
+                string value = _db.StringGet(cacheKey.GetRedisKey());
+
                 return value;
             }
-
-            return "";
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
-        private string GenerateKey(int bookingSiteId, string method, string dictionaryName, string key)
+        public bool Remove(CacheKey cacheKey)
         {
-            return string.Format("{0}_{1}_{2}_{3}", bookingSiteId, method, dictionaryName, key);
+            try
+            {
+                return _db.KeyDelete(cacheKey.GetRedisKey());
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
+        public long Increment(CacheKey cacheKey)
+        {
+            try
+            {
+                return _db.StringIncrement(cacheKey.GetRedisKey());
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
     }
 }

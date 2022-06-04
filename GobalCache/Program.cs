@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IConnectionMultiplexer>(x => 
     ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")));
 
-builder.Services.AddScoped<ICacheRepository, RedisCacheRepository>();
+builder.Services.AddSingleton<ICacheRepository, RedisCacheRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

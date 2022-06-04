@@ -4,7 +4,9 @@
 
     public interface ICacheRepository
     {
-        void SetValue(int bookingSiteId, string method, string dictionaryName, string key, int lifeTimeMinutes, string value);
-        string GetValue(int bookingSiteId, string method, string dictionaryName, string key);
+        bool Set(CacheKey cacheKey, int lifeTimeMinutes, string value);
+        string? Get(CacheKey cacheKey);
+        bool Remove(CacheKey cacheKey);
+        long Increment(CacheKey cacheKey);
     }
 }
