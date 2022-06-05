@@ -14,6 +14,6 @@
         [Required]
         public string Key { get; set; } = string.Empty;
         public string GetRedisKey()
-            => string.Format("{0}_{1}_{2}_{3}", BookingSiteId, Method, DictionaryName, Key);
+            => $"{BookingSiteId}_{Method}_{DictionaryName}_{Key}";
     }
 }

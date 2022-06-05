@@ -4,7 +4,6 @@ namespace GlobalCache.Tests
     using GobalCache.Repositories;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using StackExchange.Redis;
-    using System;
 
     [TestClass]
     public class TestRepository
@@ -52,14 +51,8 @@ namespace GlobalCache.Tests
         [TestMethod]
         public void Test_Remove()
         {
-            CacheKey cacheKey = new();
-            cacheKey.BookingSiteId = new Random().Next();
-            cacheKey.Method = "OW";
-            cacheKey.DictionaryName = "Test";
-            cacheKey.Key = "Remove";
-        
             Assert.IsFalse(_redisCacheRepository.Remove(_cacheKey));
-            
+
             _redisCacheRepository.Set(_cacheKey, 1, "BestTeams");
 
             Assert.IsTrue(_redisCacheRepository.Remove(_cacheKey));
